@@ -1,73 +1,76 @@
-import { jwtDecode } from 'jwt-decode';
-import {createContext, useState, useEffect, useContext} from "react";
-import api from '../api/axiosinstance.js';
+import React, { createContext, useState, useEffect, useContext } from 'react';
+import { authAPI } from '../api/auth';
 
-const AuthContext = createContext();
+export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setAuthenticated] = useState(false);
 
-    const loadUser = () => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            try {
-                const decoded = jwtDecode(token);
-                setUser({ ...decoded, token });
-            } catch (e) {
-                console.error("Ошибка декодирования токена:", e);
-                localStorage.removeItem('token');
-            }
-        }
-        setLoading(false);
-    };
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token") || sessionStorage.getItem("token");
+    const storedUser = localStorage.getItem("user") || sessionStorage.getItem("user");
 
-    useEffect(() => {
-        loadUser();
-    }, []);
+    if (storedToken && storedUser) {
+      try {
+        setToken(storedToken);
+        setUser(JSON.parse(storedUser));
+        setAuthenticated(true);
+      } catch (e) {
+        console.error('Ошибка парсинга user:', e);
+        localStorage.removeItem('user');
+        sessionStorage.removeItem('user');
+      }
+    }
+    setLoading(false);
+  }, []);
 
-    const login = async (username, password) => {
-      console.log("Начинаем логин:", { username, password });
+  const login = (newToken, userData, rememberMe = false) => {
+    const storage = rememberMe ? localStorage : sessionStorage;
+    storage.setItem("token", newToken);
+    storage.setItem("user", JSON.stringify(userData));
+    setToken(newToken);
+    setUser(userData);
+    setAuthenticated(true);
+  };
 
-      const formData = new URLSearchParams();
-      formData.append("grant_type", "password");
-      formData.append("username", username.trim());
-      formData.append("password", password.trim());
+  const logout = () => {
+    if (authAPI?.logout) authAPI.logout();
+    setUser(null);
+    setToken(null);
+    setAuthenticated(false);
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
+  };
 
-        try {
-            const res = await api.post('/api/auth/login', formData.toString(), {
-              headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-              },
-            });
-            console.log("Успешный ответ:", res.data);
+  const updateUserData = (updatedData) => {
+    const updatedUser = { ...user, ...updatedData };
+    setUser(updatedUser);
+    if (localStorage.getItem("user")) {
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+    }
+    if (sessionStorage.getItem("user")) {
+      sessionStorage.setItem("user", JSON.stringify(updatedUser));
+    }
+  };
 
-            const { access_token } = res.data;
-            localStorage.setItem('token', access_token);
-            loadUser();
-          } catch (err) {
-            console.error("Полная ошибка:", err);
-            console.error("Response data:", err.response?.data);
-            console.error("Status:", err.response?.status);
-            throw err;
-          }
-        };
+  const value = {
+    user, token, loading, isAuthenticated, login, logout, updateUserData,
+    hasRole: (roles) => {
+      if (!user?.role) return false;
+      return Array.isArray(roles) ? roles.includes(user.role) : user.role === roles;
+    }
+  };
 
-    const register = async (username, password, role = 'user') => {
-        const res = await api.post('/auth/register', {username, password, role});
-        return res;
-    };
-
-    const logout = () => {
-        localStorage.removeItem('token');
-        setUser(null);
-    };
-
-    return (
-          <AuthContext.Provider value={{ user, loading, login, register, logout, isAuthenticated: !!user }}>
-            {children}
-          </AuthContext.Provider>
-);
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) throw new Error('useAuth must be used within AuthProvider');
+  return context;
+};
