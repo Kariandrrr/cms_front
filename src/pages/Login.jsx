@@ -38,7 +38,10 @@ export default function Login() {
       const { access_token} = response.data;
 
       if (!access_token) {
-        throw new Error('Токен не получен');
+          console.error('Токен не получен');
+          setError('Токен не получен');
+          setLoading(false);
+  return;
       }
 
       try {

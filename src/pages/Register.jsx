@@ -97,9 +97,7 @@ export default function Register() {
         return strength;
   };
 
-     const strength = passwordStrength(form.password);
-     const strengthColors = ['bg-gray-200', 'bg-red-500', 'bg-orange-500', 'bg-yellow-500', 'bg-lime-500', 'bg-green-500'];
-     const strengthTexts = ['Очень слабый', 'Слабый', 'Средний', 'Хороший', 'Очень хороший', 'Отличный'];
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f5f5f5] to-[#e8e8e8] p-8 relative overflow-hidden">
