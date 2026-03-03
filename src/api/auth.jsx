@@ -1,15 +1,26 @@
 import api from './api';
 
 export const authAPI = {
-    login: (credentials) => api.post('auth/login', credentials),
-    register: (UserData) => api.post('auth/register', UserData),
+  login: (credentials) => {
+    const formData = new URLSearchParams();
+    formData.append('grant_type', 'password');
+    formData.append('username', credentials.username);
+    formData.append('password', credentials.password);
+    formData.append('scope', '');
 
-    logout: () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        sessionStorage.removeItem('token');
-        sessionStorage.removeItem('user');
-    },
+    return api.post('/auth/login', formData, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    });
+  },
 
-    me: () => api.get('/auth/me')
+  register: (userData) => api.post('/auth/register', userData),
+
+  logout: () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
+  }
 };
