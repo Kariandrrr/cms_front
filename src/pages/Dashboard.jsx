@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import {
-  TrendingUp,
   Users,
   FileText,
   Eye,
@@ -8,7 +7,6 @@ import {
   ArrowDown,
   MoreVertical,
   Calendar,
-  Clock,
   Activity,
   Download
 } from 'lucide-react';
