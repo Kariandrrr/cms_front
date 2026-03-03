@@ -35,7 +35,7 @@ export default function Login() {
 
       console.log('Ответ сервера:', response.data);
 
-      const { access_token, token_type } = response.data;
+      const { access_token} = response.data;
 
       if (!access_token) {
         throw new Error('Токен не получен');
@@ -51,7 +51,6 @@ export default function Login() {
         const user = userResponse.data;
         login(access_token, user, form.rememberMe);
       } catch (userErr) {
-        // Если нет эндпоинта /users/me, создаём минимальный объект
         console.warn('Не удалось получить данные пользователя:', userErr);
         login(access_token, { username: form.username, role: 'user' }, form.rememberMe);
       }
@@ -72,14 +71,16 @@ export default function Login() {
     }
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f5f5f5] to-[#e8e8e8] p-8">
+ return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f5f5f5] to-[#e8e8e8] p-8 relative overflow-hidden">
+      {/* Декоративные элементы */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-96 h-96 bg-[#c8a2c8]/20 rounded-full blur-3xl"></div>
         <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-[#b088b0]/20 rounded-full blur-3xl"></div>
       </div>
 
-      <div className="relative w-full max-w-lg">
+      <div className="relative w-full max-w-md">
+        {/* Логотип */}
         <div className="text-center mb-6">
           <div className="inline-flex items-center justify-center mb-3">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#c8a2c8] to-[#b088b0] flex items-center justify-center shadow-lg shadow-[#c8a2c8]/30">
@@ -87,11 +88,14 @@ export default function Login() {
             </div>
           </div>
           <h1 className="text-3xl font-bold text-[#4a4a4a]">
-            <span className="bg-gradient-to-r from-[#c8a2c8] to-[#b088b0] bg-clip-text text-transparent">ContentCMS</span>
+            <span className="bg-gradient-to-r from-[#c8a2c8] to-[#b088b0] bg-clip-text text-transparent">
+              ContentCMS
+            </span>
           </h1>
           <p className="text-[#9b8b9b] mt-1">Войдите в панель управления</p>
         </div>
 
+        {/* Карточка */}
         <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-[#e8d8e8] shadow-xl p-8">
           <div className="flex items-center gap-3 mb-6">
             <div className="p-3 bg-[#f8f0f8] rounded-xl border border-[#e8d8e8]">
@@ -103,13 +107,16 @@ export default function Login() {
             </div>
           </div>
 
+          {/* Ошибка */}
           {error && (
             <div className="mb-4 p-3 bg-[#ffebee] border border-[#ffcdd2] rounded-xl">
               <p className="text-sm text-[#d32f2f]">{error}</p>
             </div>
           )}
 
+          {/* Форма */}
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Логин */}
             <div>
               <label className="block text-sm font-medium text-[#6b5e6b] mb-1.5">Логин</label>
               <div className="relative">
@@ -126,6 +133,7 @@ export default function Login() {
               </div>
             </div>
 
+            {/* Пароль */}
             <div>
               <label className="block text-sm font-medium text-[#6b5e6b] mb-1.5">Пароль</label>
               <div className="relative">
@@ -150,10 +158,12 @@ export default function Login() {
               </div>
             </div>
 
+            {/* Опции */}
             <div className="flex items-center justify-between">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
+                  checked={form.rememberMe}
                   onChange={(e) => setForm({ ...form, rememberMe: e.target.checked })}
                   className="w-4 h-4 rounded border-[#e0d0e0] text-[#c8a2c8] focus:ring-[#c8a2c8]"
                 />
@@ -164,6 +174,7 @@ export default function Login() {
               </Link>
             </div>
 
+            {/* Кнопка входа */}
             <button
               type="submit"
               disabled={loading}
@@ -185,6 +196,7 @@ export default function Login() {
               )}
             </button>
 
+            {/* Разделитель */}
             <div className="relative my-4">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-[#e8d8e8]"></div>
@@ -194,6 +206,7 @@ export default function Login() {
               </div>
             </div>
 
+            {/* Соцсети */}
             <div className="flex justify-center gap-4">
               {['G', 'f', 'in'].map((s, i) => (
                 <button key={i} type="button" className="w-12 h-12 rounded-full border-2 border-[#e8d8e8] bg-white flex items-center justify-center text-[#6b5e6b] hover:border-[#c8a2c8] hover:bg-[#f8f0f8] transition-all text-lg font-bold">
@@ -203,7 +216,16 @@ export default function Login() {
             </div>
           </form>
 
-          <div className="mt-6 text-center">
+          {/* Кнопка регистрации и ссылка */}
+          <div className="mt-6 space-y-3">
+            <button
+              onClick={() => navigate('/register')}
+              className="w-full bg-white border-2 border-[#c8a2c8] text-[#c8a2c8] font-medium py-3 px-4 rounded-xl hover:bg-[#f8f0f8] focus:outline-none focus:ring-4 focus:ring-[#c8a2c8]/20 transition-all duration-200 flex items-center justify-center gap-2"
+            >
+              <Sparkles className="w-5 h-5" />
+              <span>Создать аккаунт</span>
+            </button>
+
             <Link to="/" className="text-sm text-[#9b8b9b] hover:text-[#c8a2c8] transition-colors inline-flex items-center gap-1 group">
               <span className="group-hover:-translate-x-1 transition-transform">←</span>
               Вернуться на сайт
