@@ -86,18 +86,6 @@ export default function Register() {
         }
         };
 
-    const passwordStrength = (password) => {
-        if (!password) return 0;
-        let strength = 0;
-        if (password.length >= 6) strength++;
-        if (password.length >= 10) strength++;
-        if (/[A-Z]/.test(password)) strength++;
-        if (/[0-9]/.test(password)) strength++;
-        if (/[^A-Za-z0-9]/.test(password)) strength++;
-        return strength;
-  };
-
-
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f5f5f5] to-[#e8e8e8] p-8 relative overflow-hidden">
