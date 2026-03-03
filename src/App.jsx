@@ -4,7 +4,6 @@ import { AuthProvider } from './context/AuthContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ProtectedRoute from './routes/ProtectedRoute';
-// Импортируйте другие страницы по мере создания
 
 function App() {
   return (
