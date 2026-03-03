@@ -1,7 +1,12 @@
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL || '';
+
 const api = axios.create({
-  baseURL: '/api',  // URL backend
+  baseURL: API_URL || '/api',  // URL backend
+    headers: {
+      'Content-Type': 'application/json',
+    }
 });
 
 //  для добавления токена
@@ -11,15 +16,20 @@ api.interceptors.request.use(config => {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
-});
+},
+    error => Promise.reject(error)
+);
 
 //для обработки ошибок
 api.interceptors.response.use(
   response => response,
   error => {
-    if (error.response.status === 401) {
+    if (error.response?.status === 401) {
       localStorage.removeItem('token');
-      window.location.href = '/login';  // Redirect на login
+      localStorage.removeItem('user');
+      if (window.location.pathname !== '/login') {
+           window.location.href = '/login';  // Redirect на login
+      }
     }
     return Promise.reject(error);
   }

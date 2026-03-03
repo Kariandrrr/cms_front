@@ -1,37 +1,35 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import ProtectedRoute from './routes/ProtectedRoute.jsx';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import ProtectedRoute from './routes/ProtectedRoute';
+// Импортируйте другие страницы по мере создания
 
+function App() {
+  return (
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
 
-import Login from './pages/Login.jsx';
-import AdminLayout from './layouts/AdminLayout.jsx';
-import Dashboard from './pages/admin/Dashboard.jsx';
-import ArticlesList from './pages/admin/ArticlesList.jsx';
-import PublicHome from './pages/public/Home.jsx';
-import ArticleView from './pages/public/ArticleView.jsx';
+          <Route
+            path="/admin/dashboard"
+            element={
+              <ProtectedRoute>
+                <div>Dashboard</div>
+              </ProtectedRoute>
+            }
+          />
 
-export default function App() {
-    {return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-
-        <Route element={<ProtectedRoute />}>
-          <Route path="/admin/*" element={<AdminLayout />}>
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="articles" element={<ArticlesList />} />
-
-          </Route>
-        </Route>
-        <Route path="/" element={<PublicHome />} />
-        <Route path="/articles/:slug" element={<ArticleView />} />
-      </Routes>
-
-    </BrowserRouter>
+          {/* Редирект по умолчанию */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
-}
 
-
-
-
-
+export default App;
