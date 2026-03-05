@@ -30,7 +30,7 @@ const COLORS = {
 };
 
 export default function Dashboard() {
-  const { user, hasRole, token } = useAuth();
+  const { hasRole, token } = useAuth();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -59,7 +59,6 @@ export default function Dashboard() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.detail || `Ошибка ${response.status}`);
       }
 
       const data = await response.json();
@@ -352,18 +351,18 @@ export default function Dashboard() {
             <ChartCard title="👥 Роли пользователей" height={250}>
               <PieChart>
                 <Pie
-                  data={roleDistribution}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={40}
-                  outerRadius={80}
-                  paddingAngle={5}
-                  dataKey="value"
-                >
-                  {roleDistribution.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
+                      data={roleDistribution}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      label
+                    >
+                      {/* Cell больше не нужен - цвета задаются в самих данных */}
+                    </Pie>
                 <Tooltip />
                 <Legend fontSize={12} />
               </PieChart>
