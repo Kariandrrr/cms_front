@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  LineChart, Line, PieChart, Pie, Cell, Legend
+  LineChart, Line, PieChart, Pie, Legend
 } from 'recharts';
 import {
   Users, FileText, TrendingUp, Calendar, Activity,
@@ -56,10 +56,6 @@ export default function Dashboard() {
           'Content-Type': 'application/json'
         }
       });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-      }
 
       const data = await response.json();
       setStats(data);
