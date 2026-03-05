@@ -45,7 +45,7 @@ export default function Login() {
       }
 
       try {
-        const userResponse = await api.get('/users/me', {
+        const userResponse = await api.get('/auth/me', {
           headers: {
             'Authorization': `Bearer ${access_token}`
           }
