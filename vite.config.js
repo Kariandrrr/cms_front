@@ -11,6 +11,11 @@ export default defineConfig({
         changeOrigin: true,
       },
 
+      '/statistics': {
+      target: 'http://localhost:8000',
+      changeOrigin: true,
+        },
+
       '/static': {
         target: 'http://localhost:8000',
         changeOrigin: true,
