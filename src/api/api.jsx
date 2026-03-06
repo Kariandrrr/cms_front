@@ -3,13 +3,13 @@ import axios from 'axios';
 const API_URL = import.meta.env.VITE_API_URL || '';
 
 const api = axios.create({
-  baseURL: API_URL || '/api',  // URL backend
+  baseURL: API_URL || '/api',
     headers: {
       'Content-Type': 'application/json',
     }
 });
 
-//  для добавления токена
+
 api.interceptors.request.use(config => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -28,7 +28,7 @@ api.interceptors.response.use(
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       if (window.location.pathname !== '/login') {
-           window.location.href = '/login';  // Redirect на login
+           window.location.href = '/login';
       }
     }
     return Promise.reject(error);
