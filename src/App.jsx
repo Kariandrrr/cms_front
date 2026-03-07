@@ -8,7 +8,9 @@ import ProtectedRoute from './routes/ProtectedRoute';
 import Posts from './pages/admin/Posts';
 import EditPost from './pages/admin/EditPost';
 import CreatePost from './pages/admin/CreatePost';
-
+import MyPosts from './pages/admin/MyPosts';
+import ArchivePosts from './pages/admin/ArchivePosts';
+import PublicPost from './pages/PublicPost';
 
 
 function App() {
@@ -19,6 +21,7 @@ function App() {
           {/* Публичные роуты */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+            <Route path="/posts/:slug" element={<PublicPost />} />
 
           {/* Защищенные роуты */}
           <Route
@@ -55,6 +58,21 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+            <Route path="/admin/my-posts" element={
+            <ProtectedRoute roles={['admin', 'editor', 'user']}>
+              <MyPosts />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/admin/archive" element={
+            <ProtectedRoute roles={['admin', 'editor', 'user']}>
+              <ArchivePosts />
+            </ProtectedRoute>
+          } />
+
+
+
 
           {/* Редиректы */}
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
