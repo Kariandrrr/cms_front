@@ -27,10 +27,10 @@ export default function MyPosts() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [skip, setSkip] = useState(0);
-  const [limit, setLimit] = useState(10);
+  const [limit] = useState(10);
   const [total, setTotal] = useState(0);
-  const [sortBy, setSortBy] = useState('created_at');
-  const [sortOrder, setSortOrder] = useState('desc');
+  const [sortBy] = useState('created_at');
+  const [sortOrder] = useState('desc');
 
   useEffect(() => {
     fetchMyPosts();
@@ -117,12 +117,12 @@ export default function MyPosts() {
   };
 
   const totalPages = Math.ceil(total / limit);
-  const currentPage = Math.floor(skip / limit) + 1;
+  //const currentPage = Math.floor(skip / limit) + 1;
 
-  const goToPage = (page) => {
-    const newSkip = (page - 1) * limit;
-    setSkip(newSkip);
-  };
+  // const goToPage = (page) => {
+  //   const newSkip = (page - 1) * limit;
+  //   setSkip(newSkip);
+  // };
 
   const goToPrevious = () => {
     if (skip > 0) setSkip(skip - limit);

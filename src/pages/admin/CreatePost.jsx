@@ -52,11 +52,11 @@ export default function CreatePost() {
     }
   };
 
-  const handleCancel = () => {
-    if (window.confirm('Отменить создание статьи?')) {
-      navigate('/admin/posts');
-    }
-  };
+  // const handleCancel = () => {
+  //   if (window.confirm('Отменить создание статьи?')) {
+  //     navigate('/admin/posts');
+  //   }
+  // };
 
   return (
     <Sidebar>
@@ -212,7 +212,7 @@ export default function CreatePost() {
           <button
             type="submit"
             disabled={saving}
-            onClick={(e) => {
+            onClick={() => {
               console.log('Создание статьи...', form);
             }}
             className={`px-8 py-3 bg-gradient-to-r from-[#c8a2c8] to-[#b088b0] text-white rounded-xl transition-all shadow-lg flex items-center gap-2 cursor-pointer ${

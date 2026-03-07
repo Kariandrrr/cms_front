@@ -26,7 +26,7 @@ export default function ArchivePosts() {
 
   const [search, setSearch] = useState('');
   const [skip, setSkip] = useState(0);
-  const [limit, setLimit] = useState(10);
+  const [limit] = useState(10);
   const [total, setTotal] = useState(0);
 
   useEffect(() => {
