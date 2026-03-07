@@ -8,7 +8,6 @@ import {
   AlertCircle, CheckCircle, Clock
 } from 'lucide-react';
 
-// 🎨 Цветовая палитра
 const COLORS = {
   card: 'bg-white/90 backdrop-blur-sm',
   border: 'border-[#e8d8e8]',
@@ -53,11 +52,10 @@ export default function Posts() {
       if (search) params.search = search;
       if (statusFilter) params.status = statusFilter;
 
-      // 👇 Ваш бэкенд возвращает: { items, total, page, pages, limit }
       const response = await postsAPI.getPosts(params);
 
-      setPosts(response.data.items);  // 👈 Извлекаем items
-      setTotal(response.data.total);  // 👈 Извлекаем total
+      setPosts(response.data.items);
+      setTotal(response.data.total);
 
     } catch (err) {
       console.error('Error fetching posts:', err);
@@ -131,7 +129,6 @@ export default function Posts() {
     });
   };
 
-  // 👇 Пагинация на основе total с бэкенда
   const totalPages = Math.ceil(total / limit);
   const currentPage = Math.floor(skip / limit) + 1;
 
@@ -166,19 +163,36 @@ export default function Posts() {
             <p className="text-[#9b8b9b]">Управление публикациями</p>
           </div>
 
-          <button
-            onClick={handleCreate}
-            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#c8a2c8] to-[#b088b0] text-white rounded-xl hover:opacity-90 transition-opacity shadow-lg font-medium"
-          >
-            <Plus size={20} />
-            <span>Новая статья</span>
-          </button>
+          <div className="flex flex-wrap gap-3">
+            <button
+              onClick={() => navigate('/admin/my-posts')}
+              className="flex items-center gap-2 px-4 py-2 border-2 border-[#c8a2c8] text-[#c8a2c8] rounded-xl hover:bg-[#f8f0f8] transition-colors"
+            >
+              <User size={18} />
+              <span>Мои статьи</span>
+            </button>
+
+            <button
+              onClick={() => navigate('/admin/archive')}
+              className="flex items-center gap-2 px-4 py-2 border-2 border-[#9b8b9b] text-[#9b8b9b] rounded-xl hover:bg-[#f8f0f8] transition-colors"
+            >
+              <EyeOff size={18} />
+              <span>Архив</span>
+            </button>
+
+            <button
+              onClick={handleCreate}
+              className="flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-[#c8a2c8] to-[#b088b0] text-white rounded-xl hover:opacity-90 transition-opacity shadow-lg"
+            >
+              <Plus size={18} />
+              <span>Новая статья</span>
+            </button>
+          </div>
         </div>
 
         {/* Фильтры */}
         <div className={`${COLORS.card} rounded-2xl ${COLORS.border} shadow-lg p-4 mb-6`}>
           <div className="flex flex-col md:flex-row gap-4">
-            {/* Поиск */}
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9b8b9b]" size={20} />
               <input
@@ -193,7 +207,6 @@ export default function Posts() {
               />
             </div>
 
-            {/* Фильтр по статусу */}
             <div className="flex items-center gap-2">
               <Filter className="text-[#9b8b9b]" size={20} />
               <select
@@ -211,7 +224,6 @@ export default function Posts() {
               </select>
             </div>
 
-            {/* Сортировка */}
             <select
               value={`${sortBy}-${sortOrder}`}
               onChange={(e) => {
@@ -258,130 +270,80 @@ export default function Posts() {
           </div>
         ) : (
           <>
-            {/* Десктопная таблица */}
-            <div className={`${COLORS.card} rounded-2xl ${COLORS.border} shadow-lg overflow-hidden hidden md:block`}>
-              <table className="w-full">
-                <thead className="bg-gradient-to-r from-[#faf7fa] to-[#f5f0f5] border-b border-[#e8d8e8]">
-                  <tr>
-                    <th className="text-left px-6 py-4 text-sm font-semibold text-[#4a4a4a]">Название</th>
-                    <th className="text-left px-6 py-4 text-sm font-semibold text-[#4a4a4a]">Статус</th>
-                    <th className="text-left px-6 py-4 text-sm font-semibold text-[#4a4a4a]">Автор</th>
-                    <th className="text-left px-6 py-4 text-sm font-semibold text-[#4a4a4a]">Дата создания</th>
-                    <th className="text-left px-6 py-4 text-sm font-semibold text-[#4a4a4a]">Действия</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#e8d8e8]">
-                  {posts.map((post) => (
-                    <tr key={post.id} className="hover:bg-[#faf7fa] transition-colors group">
-                      <td className="px-6 py-4">
-                        <div>
-                          <h3 className="font-medium text-[#4a4a4a] mb-1 group-hover:text-[#c8a2c8] transition-colors">
-                            {post.title}
-                          </h3>
-                          {post.summary && (
-                            <p className="text-sm text-[#9b8b9b] line-clamp-1">{post.summary}</p>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        {getStatusBadge(post.status)}
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2 text-[#6b5e6b]">
-                          <User size={16} />
-                          <span className="text-sm">{post.author_username || '—'}</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2 text-sm text-[#6b5e6b]">
-                          <Calendar size={16} />
-                          {formatDate(post.created_at)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          {post.status !== 'published' && (
-                            <button
-                              onClick={() => handlePublish(post.id)}
-                              className="p-2 text-[#66bb6a] hover:bg-[#66bb6a]/10 rounded-lg transition-colors"
-                              title="Опубликовать"
-                            >
-                              <Eye size={18} />
-                            </button>
-                          )}
-                          <button
-                            onClick={() => handleEdit(post.id)}
-                            className="p-2 text-[#42a5f5] hover:bg-[#42a5f5]/10 rounded-lg transition-colors"
-                            title="Редактировать"
-                          >
-                            <Edit2 size={18} />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(post.id)}
-                            className="p-2 text-[#ef5350] hover:bg-[#ef5350]/10 rounded-lg transition-colors"
-                            title="Удалить"
-                          >
-                            <Trash2 size={18} />
-                          </button>
-                        </div>
-                      </td>
+            <div className={`${COLORS.card} rounded-2xl ${COLORS.border} shadow-lg overflow-hidden`}>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[800px]">
+                  <thead className="bg-gradient-to-r from-[#faf7fa] to-[#f5f0f5] border-b border-[#e8d8e8]">
+                    <tr>
+                      <th className="text-left px-6 py-4 text-sm font-semibold text-[#4a4a4a]">Название</th>
+                      <th className="text-left px-6 py-4 text-sm font-semibold text-[#4a4a4a]">Статус</th>
+                      <th className="text-left px-6 py-4 text-sm font-semibold text-[#4a4a4a]">Автор</th>
+                      <th className="text-left px-6 py-4 text-sm font-semibold text-[#4a4a4a]">Дата создания</th>
+                      <th className="text-left px-6 py-4 text-sm font-semibold text-[#4a4a4a]">Действия</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-[#e8d8e8]">
+                    {posts.map((post) => (
+                      <tr key={post.id} className="hover:bg-[#faf7fa] transition-colors group">
+                        <td className="px-6 py-4">
+                          <div>
+                            <h3 className="font-medium text-[#4a4a4a] mb-1 group-hover:text-[#c8a2c8] transition-colors">
+                              {post.title}
+                            </h3>
+                            {post.summary && (
+                              <p className="text-sm text-[#9b8b9b] line-clamp-1">{post.summary}</p>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          {getStatusBadge(post.status)}
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2 text-[#6b5e6b]">
+                            <User size={16} />
+                            <span className="text-sm">{post.author_username || '—'}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2 text-sm text-[#6b5e6b]">
+                            <Calendar size={16} />
+                            {formatDate(post.created_at)}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2">
+                            {post.status !== 'published' && (
+                              <button
+                                onClick={() => handlePublish(post.id)}
+                                className="p-2 text-[#66bb6a] hover:bg-[#66bb6a]/10 rounded-lg transition-colors"
+                                title="Опубликовать"
+                              >
+                                <Eye size={18} />
+                              </button>
+                            )}
+                            <button
+                              onClick={() => handleEdit(post.id)}
+                              className="p-2 text-[#42a5f5] hover:bg-[#42a5f5]/10 rounded-lg transition-colors"
+                              title="Редактировать"
+                            >
+                              <Edit2 size={18} />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(post.id)}
+                              className="p-2 text-[#ef5350] hover:bg-[#ef5350]/10 rounded-lg transition-colors"
+                              title="Удалить"
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
 
-            {/* Мобильные карточки */}
-            <div className="md:hidden space-y-4">
-              {posts.map((post) => (
-                <div key={post.id} className={`${COLORS.card} rounded-xl ${COLORS.border} shadow-lg p-4`}>
-                  <div className="flex items-start justify-between mb-3">
-                    <h3 className="font-medium text-[#4a4a4a] flex-1 mr-3">{post.title}</h3>
-                    {getStatusBadge(post.status)}
-                  </div>
-
-                  {post.summary && (
-                    <p className="text-sm text-[#9b8b9b] mb-3 line-clamp-2">{post.summary}</p>
-                  )}
-
-                  <div className="flex items-center gap-4 text-sm text-[#6b5e6b] mb-4">
-                    <div className="flex items-center gap-1">
-                      <User size={14} />
-                      <span>{post.author_username || '—'}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Calendar size={14} />
-                      <span>{formatDate(post.created_at)}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 pt-3 border-t border-[#e8d8e8]">
-                    {post.status !== 'published' && (
-                      <button
-                        onClick={() => handlePublish(post.id)}
-                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-[#66bb6a]/10 text-[#66bb6a] rounded-lg hover:bg-[#66bb6a]/20 transition-colors text-sm font-medium"
-                      >
-                        <Eye size={16} />
-                        Опубликовать
-                      </button>
-                    )}
-                    <button
-                      onClick={() => handleEdit(post.id)}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-[#42a5f5]/10 text-[#42a5f5] rounded-lg hover:bg-[#42a5f5]/20 transition-colors text-sm font-medium"
-                    >
-                      <Edit2 size={16} />
-                      Редактировать
-                    </button>
-                    <button
-                      onClick={() => handleDelete(post.id)}
-                      className="p-2 text-[#ef5350] hover:bg-[#ef5350]/10 rounded-lg transition-colors"
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
 
             {/* Пагинация */}
             {totalPages > 1 && (

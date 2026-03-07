@@ -7,7 +7,6 @@ import {
   FileText, Tag, Eye, EyeOff, Clock, Sparkles
 } from 'lucide-react';
 
-// 🎨 Цветовая палитра (та же что и в Posts.jsx)
 const COLORS = {
   card: 'bg-white/90 backdrop-blur-sm',
   border: 'border-[#e8d8e8]',
@@ -41,7 +40,6 @@ export default function CreatePost() {
       const response = await postsAPI.createPost(form);
       setSuccess('Статья успешно создана!');
 
-      // Через 1 секунду переходим к редактированию созданного поста
       setTimeout(() => {
         const postId = response.data.id;
         navigate(`/admin/posts/${postId}/edit`);
@@ -85,7 +83,6 @@ export default function CreatePost() {
 
         {/* Форма */}
         <div className={`${COLORS.card} rounded-2xl ${COLORS.border} shadow-lg p-8`}>
-          {/* Успешное сообщение */}
           {success && (
             <div className="mb-6 p-4 bg-[#e8f5e9] border border-[#c8e6c9] rounded-xl flex items-center gap-3">
               <div className="w-6 h-6 rounded-full bg-[#66bb6a] flex items-center justify-center">
@@ -170,7 +167,7 @@ export default function CreatePost() {
                   return (
                     <button
                       key={status.value}
-                      type="button"  // 👈 ВАЖНО: type="button" чтобы не сабмитить форму
+                      type="button"
                       onClick={() => {
                         console.log('Выбран статус:', status.value);
                         setForm({ ...form, status: status.value });
@@ -199,7 +196,7 @@ export default function CreatePost() {
 
 
           <button
-            type="button"  // 👈 ВАЖНО
+            type="button"
             onClick={() => {
               console.log('Отмена создания');
               if (window.confirm('Отменить создание статьи?')) {
@@ -213,7 +210,7 @@ export default function CreatePost() {
           </button>
 
           <button
-            type="submit"  // 👈 ВАЖНО: type="submit" для отправки формы
+            type="submit"
             disabled={saving}
             onClick={(e) => {
               console.log('Создание статьи...', form);

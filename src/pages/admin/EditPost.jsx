@@ -7,7 +7,6 @@ import {
   FileText, Tag, Eye, EyeOff, Clock
 } from 'lucide-react';
 
-// 🎨 Цветовая палитра (та же что и в Posts.jsx)
 const COLORS = {
   card: 'bg-white/90 backdrop-blur-sm',
   border: 'border-[#e8d8e8]',
@@ -85,7 +84,6 @@ export default function EditPost() {
       await postsAPI.updatePost(id, form);
       setSuccess('Пост успешно обновлен!');
 
-      // Через 1 секунду возвращаемся к списку
       setTimeout(() => {
         navigate('/admin/posts');
       }, 1000);

@@ -20,7 +20,7 @@ api.interceptors.request.use(config => {
     error => Promise.reject(error)
 );
 
-//для обработки ошибок
+
 api.interceptors.response.use(
   response => response,
   error => {
