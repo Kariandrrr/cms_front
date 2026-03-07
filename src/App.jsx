@@ -5,6 +5,13 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/admin/Dashboard';
 import ProtectedRoute from './routes/ProtectedRoute';
+import Posts from './pages/admin/Posts';
+import EditPost from './pages/admin/EditPost';
+import CreatePost from './pages/admin/CreatePost';
+import MyPosts from './pages/admin/MyPosts';
+import ArchivePosts from './pages/admin/ArchivePosts';
+import PublicPost from './pages/PublicPost';
+
 
 function App() {
   return (
@@ -14,6 +21,7 @@ function App() {
           {/* Публичные роуты */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+            <Route path="/posts/:slug" element={<PublicPost />} />
 
           {/* Защищенные роуты */}
           <Route
@@ -25,8 +33,49 @@ function App() {
             }
           />
 
+          <Route
+          path="/admin/posts"
+          element={
+            <ProtectedRoute roles={['admin', 'editor', 'user']}>
+              <Posts />
+            </ProtectedRoute>
+          }
+          />
+
+          <Route
+            path="/admin/posts/:id/edit"
+            element={
+              <ProtectedRoute roles={['admin', 'editor', 'user']}>
+                <EditPost />
+              </ProtectedRoute>
+            }
+/>
+            <Route
+            path="/admin/posts/new"
+            element={
+              <ProtectedRoute roles={['admin', 'editor', 'user']}>
+                <CreatePost />
+              </ProtectedRoute>
+            }
+          />
+
+            <Route path="/admin/my-posts" element={
+            <ProtectedRoute roles={['admin', 'editor', 'user']}>
+              <MyPosts />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/admin/archive" element={
+            <ProtectedRoute roles={['admin', 'editor', 'user']}>
+              <ArchivePosts />
+            </ProtectedRoute>
+          } />
+
+
+
+
           {/* Редиректы */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </Router>

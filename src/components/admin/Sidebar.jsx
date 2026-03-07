@@ -1,4 +1,3 @@
-// src/components/admin/Sidebar.jsx
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import {
@@ -7,7 +6,7 @@ import {
 } from 'lucide-react';
 
 export default function Sidebar({ children }) {
-  const { user, logout, hasRole } = useAuth();
+  const { logout, hasRole } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -31,18 +30,20 @@ export default function Sidebar({ children }) {
     <div className="flex min-h-screen bg-gradient-to-br from-[#f5f5f5] to-[#e8e8e8]">
       {/* Sidebar */}
       <aside className="w-64 bg-white/95 backdrop-blur-sm border-r border-[#e8d8e8] shadow-xl flex flex-col">
-        {/* Логотип */}
-        <div className="p-6 border-b border-[#e8d8e8]">
-          <Link to="/admin/dashboard" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#c8a2c8] to-[#b088b0] flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
-              <Sparkles className="w-5 h-5 text-white" />
+        <div className="p-6 border-b border-[#e8d8e8] bg-gradient-to-b from-[#faf7fa] to-white">
+          <Link to="/admin/dashboard" className="flex flex-col items-center gap-3 group">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#c8a2c8] to-[#b088b0] flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+              <Sparkles className="w-7 h-7 text-white" />
             </div>
-            <div>
-              <h2 className="font-bold text-[#4a4a4a]">ContentCMS</h2>
-              <p className="text-xs text-[#9b8b9b]">Admin Panel</p>
+            <div className="text-center">
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-[#c8a2c8] to-[#b088b0] bg-clip-text text-transparent whitespace-nowrap">
+                ContentCMS
+              </h2>
+              <p className="text-xs text-[#9b8b9b] mt-0.5 font-medium">Admin Panel</p>
             </div>
           </Link>
         </div>
+
 
         {/* Меню */}
         <nav className="p-4 space-y-2 flex-1">
@@ -57,8 +58,8 @@ export default function Sidebar({ children }) {
                 className={`
                   flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group
                   ${isActive 
-                    ? 'bg-gradient-to-r from-[#c8a2c8] to-[#b088b0] text-white shadow-lg' 
-                    : 'text-[#6b5e6b] hover:bg-[#f8f0f8] hover:text-[#c8a2c8]'
+                    ? 'bg-gradient-to-r from-[#c8a2c8] to-[#b088b0] text-white shadow-lg transform scale-[1.02]' 
+                    : 'text-[#6b5e6b] hover:bg-[#f8f0f8] hover:text-[#c8a2c8] hover:translate-x-1'
                   }
                 `}
               >
@@ -66,31 +67,19 @@ export default function Sidebar({ children }) {
                   <Icon className={`w-5 h-5 ${isActive ? 'text-white' : 'group-hover:scale-110 transition-transform'}`} />
                   <span className="font-medium">{item.label}</span>
                 </div>
-                {isActive && <ChevronRight className="w-4 h-4 animate-pulse" />}
+                {isActive && <ChevronRight className="w-4 h-4" />}
               </Link>
             );
           })}
         </nav>
 
-        {/* Профиль пользователя */}
+        {/* Кнопка выхода - внизу */}
         <div className="p-4 border-t border-[#e8d8e8]">
-          <div className="flex items-center gap-3 mb-4 p-3 rounded-xl bg-[#f8f0f8]">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#c8a2c8] to-[#b088b0] flex items-center justify-center shadow-md">
-              <span className="text-white font-bold text-sm">
-                {user?.username?.charAt(0).toUpperCase() || 'U'}
-              </span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-[#4a4a4a] truncate">{user?.username || 'User'}</p>
-              <p className="text-xs text-[#9b8b9b] capitalize">{user?.role || 'user'}</p>
-            </div>
-          </div>
-
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm text-[#d32f2f] hover:bg-[#ffebee] rounded-xl transition-colors font-medium"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-[#ef5350] to-[#e53935] text-white rounded-xl hover:opacity-90 transition-all duration-200 font-medium shadow-lg hover:shadow-xl hover:scale-[1.02]"
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="w-5 h-5" />
             <span>Выйти</span>
           </button>
         </div>
@@ -99,6 +88,7 @@ export default function Sidebar({ children }) {
       {/* Основной контент */}
       <main className="flex-1 overflow-auto">
         {children}
+
       </main>
     </div>
   );

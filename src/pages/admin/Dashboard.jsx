@@ -6,11 +6,11 @@ import {
 } from 'recharts';
 import {
   Users, FileText, TrendingUp, Calendar, Activity,
-  Award, Clock, Eye, Sparkles, ArrowUp, ArrowDown, ChevronRight
+  Award, Clock, Eye, Sparkles, ArrowUp, ArrowDown, ChevronRight,
+  Edit, Trash2, User
 } from 'lucide-react';
 import Sidebar from '../../components/admin/Sidebar';
 
-// 🎨 Цветовая палитра
 const COLORS = {
   primary: '#c8a2c8',
   primaryDark: '#b088b0',
@@ -32,12 +32,14 @@ const COLORS = {
 export default function Dashboard() {
   const { hasRole, token } = useAuth();
   const [stats, setStats] = useState(null);
+  const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [timeRange, setTimeRange] = useState('week');
 
   useEffect(() => {
     fetchStats();
+    fetchArticles();
   }, [timeRange]);
 
   const fetchStats = async () => {
@@ -68,7 +70,57 @@ export default function Dashboard() {
     }
   };
 
-  // 📊 Данные для графиков
+  const fetchArticles = async () => {
+  try {
+    const endpoint = hasRole(['admin'])
+      ? 'http://localhost:8000/articles'
+      : 'http://localhost:8000/articles/my-articles';
+
+    const response = await fetch(endpoint, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    const data = await response.json();
+
+    const articlesData = Array.isArray(data)
+      ? data
+      : Array.isArray(data.items)
+        ? data.items
+        : Array.isArray(data.data)
+          ? data.data
+          : [];
+
+    setArticles(articlesData);
+  } catch (err) {
+    console.error('Error fetching articles:', err);
+    setArticles([]);
+  }
+};
+
+  const handleEdit = (id) => {
+    window.location.href = `/admin/articles/${id}/edit`;
+  };
+
+  const handleDelete = async (id) => {
+    if (confirm('Вы уверены, что хотите удалить эту статью?')) {
+      try {
+        await fetch(`http://localhost:8000/articles/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        fetchArticles();
+      } catch (err) {
+        console.error('Error deleting article:', err);
+      }
+    }
+  };
+
   const postsChartData = [
     { name: 'Пн', published: stats?.posts?.published_posts || 0, drafts: stats?.posts?.draft_posts || 0 },
     { name: 'Вт', published: 2, drafts: 1 },
@@ -140,6 +192,108 @@ export default function Dashboard() {
     </div>
   );
 
+  // 📰 Компонент горизонтальной таблицы статей
+  const ArticlesTable = () => (
+  <div className={`${COLORS.card} rounded-2xl ${COLORS.border} shadow-lg overflow-hidden`}>
+    {/* Заголовок таблицы */}
+    <div className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-[#e8d8e8] bg-gradient-to-r from-[#faf7fa] to-[#f5f0f5] text-sm font-semibold text-[#6b5e6b]">
+      <div className="col-span-5">НАЗВАНИЕ</div>
+      <div className="col-span-2">СТАТУС</div>
+      <div className="col-span-2">АВТОР</div>
+      <div className="col-span-2">ДАТА СОЗДАНИЯ</div>
+      <div className="col-span-1">ДЕЙСТВИЯ</div>
+    </div>
+
+    {/* Тело таблицы */}
+    <div className="divide-y divide-[#e8d8e8]">
+      {!articles || articles.length === 0 ? (
+        <div className="px-6 py-12 text-center text-[#9b8b9b]">
+          <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
+          <p>Статьи не найдены</p>
+        </div>
+      ) : (
+        articles.map((article) => (
+          <div
+            key={article.id}
+            className="grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-[#faf7fa] transition-colors group"
+          >
+            {/* Название и описание */}
+            <div className="col-span-5">
+              <h4 className="font-semibold text-[#4a4a4a] mb-1 truncate" title={article.title}>
+                {article.title}
+              </h4>
+              <p className="text-sm text-[#9b8b9b] truncate" title={article.content}>
+                {article.excerpt || article.content?.substring(0, 60) + '...' || 'Нет описания'}
+              </p>
+            </div>
+
+            {/* Статус */}
+            <div className="col-span-2">
+              <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${
+                article.status === 'published'
+                  ? 'bg-[#e8f5e9] text-[#2e7d32]'
+                  : article.status === 'draft'
+                  ? 'bg-[#fff3e0] text-[#ef6c00]'
+                  : 'bg-[#f3e5f5] text-[#7b1fa2]'
+              }`}>
+                <Activity size={12} />
+                {article.status === 'published' ? 'Опубликован' :
+                 article.status === 'draft' ? 'Черновик' : article.status}
+              </span>
+            </div>
+
+            {/* Автор */}
+            <div className="col-span-2">
+              <div className="flex items-center gap-2 text-[#6b5e6b]">
+                <User size={14} />
+                <span className="text-sm truncate" title={article.author?.name || article.author}>
+                  {article.author?.name || article.author || article.author_username || '—'}
+                </span>
+              </div>
+            </div>
+
+            {/* Дата создания */}
+            <div className="col-span-2">
+              <div className="flex items-center gap-2 text-[#6b5e6b]">
+                <Calendar size={14} />
+                <span className="text-sm">
+                  {article.created_at ? new Date(article.created_at).toLocaleString('ru-RU', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  }) : '—'}
+                </span>
+              </div>
+            </div>
+
+            {/* Действия */}
+            <div className="col-span-1">
+              <div className="flex gap-1">
+                <button
+                  onClick={() => handleEdit(article.id)}
+                  className="p-2 rounded-lg border border-[#e8d8e8] hover:border-[#c8a2c8] hover:bg-[#f8f0f8] transition-all group/btn"
+                  title="Редактировать"
+                >
+                  <Edit className="w-4 h-4 text-[#6b5e6b] group-hover/btn:text-[#c8a2c8]" />
+                </button>
+                <button
+                  onClick={() => handleDelete(article.id)}
+                  className="p-2 rounded-lg border border-[#e8d8e8] hover:border-[#ef5350] hover:bg-[#ffebee] transition-all group/btn"
+                  title="Удалить"
+                >
+                  <Trash2 className="w-4 h-4 text-[#6b5e6b] group-hover/btn:text-[#ef5350]" />
+                </button>
+              </div>
+            </div>
+          </div>
+        ))
+      )}
+    </div>
+  </div>
+);
+
   // 📈 Компонент графика
   const ChartCard = ({ title, children, height = 300 }) => (
     <div className={`${COLORS.card} rounded-2xl ${COLORS.border} shadow-lg p-6`}>
@@ -187,7 +341,7 @@ export default function Dashboard() {
     );
   }
 
-  // 🎨 Дашборд для ADMIN (с горизонтальными таблицами)
+  // 🎨 Дашборд для ADMIN
   if (hasRole(['admin']) && stats) {
     // Данные для таблицы пользователей
     const userRows = [
@@ -295,6 +449,11 @@ export default function Dashboard() {
             <StatsTable title="📰 Статьи" rows={postRows} icon={FileText} />
           </div>
 
+          {/* Таблица статей */}
+          <div className="mb-8">
+            <ArticlesTable />
+          </div>
+
           {/* Графики */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             <ChartCard title="📊 Публикации по дням">
@@ -347,18 +506,18 @@ export default function Dashboard() {
             <ChartCard title="👥 Роли пользователей" height={250}>
               <PieChart>
                 <Pie
-                      data={roleDistribution}
-                      dataKey="value"
-                      nameKey="name"
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      label
-                    >
-                      {/* Cell больше не нужен - цвета задаются в самих данных */}
-                    </Pie>
+                  data={roleDistribution}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  label
+                >
+                  {/* Cell больше не нужен - цвета задаются в самих данных */}
+                </Pie>
                 <Tooltip />
                 <Legend fontSize={12} />
               </PieChart>
@@ -401,7 +560,7 @@ export default function Dashboard() {
     );
   }
 
-  // 🎨 Дашборд для EDITOR/USER (с горизонтальной таблицей)
+  // 🎨 Дашборд для EDITOR/USER
   if (stats) {
     const myStatsRows = [
       {
@@ -436,9 +595,14 @@ export default function Dashboard() {
             <p className="text-[#9b8b9b]">Ваши публикации и активность</p>
           </div>
 
-          {/* Горизонтальная таблица */}
+          {/* Горизонтальная таблица статистики */}
           <div className="mb-8">
             <StatsTable title="📊 Мои показатели" rows={myStatsRows} icon={Award} />
+          </div>
+
+          {/* Таблица моих статей */}
+          <div className="mb-8">
+            <ArticlesTable />
           </div>
 
           {/* График активности */}

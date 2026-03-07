@@ -43,6 +43,7 @@ export default function Login() {
           setLoading(false);
   return;
       }
+    localStorage.setItem('token', access_token);
 
       try {
         const userResponse = await api.get('/auth/me', {
