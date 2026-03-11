@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Sidebar from '../../components/admin/Sidebar';
 import {
- Save, AlertCircle, CheckCircle,
+  Save, AlertCircle, CheckCircle,
   Loader2, Palette, Shield, Bell, Globe
 } from 'lucide-react';
 
@@ -19,7 +19,6 @@ export default function Settings() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
-
   const [settings, setSettings] = useState({
     siteName: 'ContentCMS',
     siteDescription: 'Система управления контентом',
@@ -38,7 +37,6 @@ export default function Settings() {
 
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
-
       setSuccess('Настройки успешно сохранены!');
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import api from '../../api/axiosinstance';
 import Sidebar from '../../components/admin/Sidebar';
 import {
-  User, Users, Search, Plus, Edit2, Trash2, Shield,
+  User, Users as UsersIcon, Search, Plus, Edit2, Trash2, Shield,
   Mail, Calendar, AlertCircle, CheckCircle,
   ChevronLeft, ChevronRight, Loader2
 } from 'lucide-react';
@@ -24,7 +24,6 @@ export default function Users() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
   const [skip, setSkip] = useState(0);
@@ -53,7 +52,6 @@ export default function Users() {
         setUsers(response.data);
         setTotal(response.data.length);
       }
-
     } catch (err) {
       console.error('Error fetching users:', err);
       setError('Не удалось загрузить пользователей');
@@ -66,7 +64,6 @@ export default function Users() {
     if (!window.confirm('Вы уверены, что хотите удалить этого пользователя?')) {
       return;
     }
-
     try {
       await api.delete(`/users/${id}`);
       setUsers(users.filter(user => user.id !== id));
@@ -89,7 +86,6 @@ export default function Users() {
       editor: { color: 'bg-[#42a5f5]/10 text-[#1e88e5]', icon: Edit2, label: 'Редактор' },
       user: { color: 'bg-[#66bb6a]/10 text-[#43a047]', icon: User, label: 'Пользователь' },
     };
-
     const badge = badges[role] || badges.user;
     const Icon = badge.icon;
 
@@ -116,7 +112,7 @@ export default function Users() {
     <Sidebar>
       <div className="p-8">
         {/* Заголовок */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
           <div>
             <h1 className="text-3xl font-bold text-[#4a4a4a] mb-1">
               <span className="bg-gradient-to-r from-[#c8a2c8] to-[#b088b0] bg-clip-text text-transparent">
@@ -183,8 +179,7 @@ export default function Users() {
           </div>
         ) : users.length === 0 ? (
           <div className={`${COLORS.card} rounded-2xl ${COLORS.border} shadow-lg p-12 text-center`}>
-            <Users className="w-16 h-16 text-[#9b8b9b] mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-[#4a4a4a] mb-2">Нет пользователей</h3>
+            <UsersIcon className="w-16 h-16 text-[#9b8b9b] mx-auto mb-4" />            <h3 className="text-lg font-semibold text-[#4a4a4a] mb-2">Нет пользователей</h3>
             <p className="text-[#6b5e6b] mb-6">Создайте первого пользователя</p>
             <button
               onClick={() => navigate('/admin/users/new')}
