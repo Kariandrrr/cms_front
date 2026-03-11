@@ -11,6 +11,8 @@ import CreatePost from './pages/admin/CreatePost';
 import MyPosts from './pages/admin/MyPosts';
 import ArchivePosts from './pages/admin/ArchivePosts';
 import PublicPost from './pages/PublicPost';
+import Settings from './pages/admin/Settings';
+import Users from './pages/admin/Users';
 
 
 function App() {
@@ -65,12 +67,23 @@ function App() {
             </ProtectedRoute>
           } />
 
-          <Route path="/admin/archive" element={
-            <ProtectedRoute roles={['admin', 'editor', 'user']}>
-              <ArchivePosts />
-            </ProtectedRoute>
-          } />
+          {/*<Route path="/admin/archive" element={*/}
+          {/*  <ProtectedRoute roles={['admin', 'editor', 'user']}>*/}
+          {/*    <ArchivePosts />*/}
+          {/*  </ProtectedRoute>*/}
+          {/*} />*/}
 
+            <Route path="/admin/users" element={
+          <ProtectedRoute roles={['admin']}>
+            <Users />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/admin/settings" element={
+          <ProtectedRoute roles={['admin']}>
+            <Settings />
+          </ProtectedRoute>
+        } />
 
 
 
