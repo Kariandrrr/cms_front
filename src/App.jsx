@@ -12,7 +12,8 @@ import MyPosts from './pages/admin/MyPosts';
 import ArchivePosts from './pages/admin/ArchivePosts';
 import PublicPost from './pages/PublicPost';
 import Settings from './pages/admin/Settings';
-import Users from './pages/admin/Users';
+import UserForm from './pages/admin/Users';
+import NewUserForm from "./pages/admin/NewUserForm.jsx";
 
 
 function App() {
@@ -75,13 +76,19 @@ function App() {
 
             <Route path="/admin/users" element={
           <ProtectedRoute roles={['admin']}>
-            <Users />
+            <UserForm />
           </ProtectedRoute>
         } />
 
         <Route path="/admin/settings" element={
           <ProtectedRoute roles={['admin']}>
             <Settings />
+          </ProtectedRoute>
+        } />
+
+            <Route path="/admin/users/new" element={
+          <ProtectedRoute roles={['admin']}>
+            <NewUserForm />
           </ProtectedRoute>
         } />
 
