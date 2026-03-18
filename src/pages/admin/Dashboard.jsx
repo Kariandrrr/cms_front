@@ -8,7 +8,7 @@ import {
 import {
   Users, FileText, TrendingUp, Calendar, Activity,
   Award, Clock, Sparkles, ArrowUp, ArrowDown, ChevronRight,
-  Edit, Trash2, User, Archive, RotateCcw
+  Edit, Trash2, User, Archive,
 } from 'lucide-react';
 import Sidebar from '../../components/admin/Sidebar';
 
@@ -66,8 +66,13 @@ export default function Dashboard() {
       console.log('Response status:', response.status);
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+            console.error(`HTTP error! status: ${response.status}`);
+            setError(`HTTP error! status: ${response.status}`);
+            setStats(null);
+            setLoading(false);
+            return;
       }
+
 
       const data = await response.json();
       console.log('Stats data received:', data);
@@ -211,15 +216,15 @@ export default function Dashboard() {
   ].filter(item => item.value > 0);
 
   // 📋 Данные для распределения ролей с цветами
-  const roleDistribution = [
-    { name: 'Админы', value: 1, fill: COLORS.primary },
-    { name: 'Редакторы', value: 2, fill: COLORS.primaryDark },
-    {
-      name: 'Пользователи',
-      value: Math.max(0, (stats?.users?.total_users || 0) - 3),
-      fill: COLORS.secondary
-    },
-  ].filter(item => item.value > 0);
+  // const roleDistribution = [
+  //   { name: 'Админы', value: 1, fill: COLORS.primary },
+  //   { name: 'Редакторы', value: 2, fill: COLORS.primaryDark },
+  //   {
+  //     name: 'Пользователи',
+  //     value: Math.max(0, (stats?.users?.total_users || 0) - 3),
+  //     fill: COLORS.secondary
+  //   },
+  // ].filter(item => item.value > 0);
 
   // 📋 Компонент горизонтальной таблицы статистики
   const StatsTable = ({ title, rows, icon: Icon }) => (

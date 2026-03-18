@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { postsAPI } from '../../api/api_posts';
 import Sidebar from '../../components/admin/Sidebar';
 import {
-    X, ArrowLeft, AlertCircle, Loader2,
+    X, ArrowLeft, Loader2,
   FileText, Tag, Eye, EyeOff, Clock, Sparkles
 } from 'lucide-react';
 
