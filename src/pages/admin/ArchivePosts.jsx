@@ -3,9 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { postsAPI } from '../../api/api_posts';
 import Sidebar from '../../components/admin/Sidebar';
 import {
-  Search, Edit2, Trash2, EyeOff,
-   ChevronRight, AlertCircle,
-  ArrowLeft, Archive
+  Search, Edit2, Trash2, EyeOff, AlertCircle,
+  ArrowLeft, Archive, ChevronLeft, RotateCcw
 } from 'lucide-react';
 
 const COLORS = {
@@ -33,6 +32,7 @@ export default function ArchivePosts() {
     fetchArchive();
   }, [skip, limit, search]);
 
+
   const fetchArchive = async () => {
     try {
       setLoading(true);
@@ -43,13 +43,23 @@ export default function ArchivePosts() {
 
       const response = await postsAPI.getArchive(params);
 
-      if (response.data?.items) {
-        setPosts(response.data.items);
-        setTotal(response.data.total);
-      } else if (Array.isArray(response.data)) {
-        setPosts(response.data);
+      let rawData = [];
+
+
+      if (Array.isArray(response.data)) {
+        rawData = response.data;
         setTotal(response.data.length);
+      } else if (response.data?.items) {
+        rawData = response.data.items;
+        setTotal(response.data.total);
       }
+
+      rawData.forEach(p => console.log(`Проверка поста: "${p.title}" -> статус: "${p.status}"`));
+
+
+      const validArchivePosts = rawData.filter(post => post.status === 'archived');
+
+      setPosts(validArchivePosts);
 
     } catch (err) {
       console.error('Error fetching archive:', err);
@@ -60,7 +70,7 @@ export default function ArchivePosts() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Вы уверены, что хотите удалить этот пост?')) return;
+    if (!window.confirm('Вы уверены, что хотите удалить этот пост НАВСЕГДА?')) return;
 
     try {
       await postsAPI.deletePost(id);
@@ -68,6 +78,19 @@ export default function ArchivePosts() {
     } catch (err) {
       console.error('Error deleting post:', err);
       alert('Не удалось удалить пост');
+    }
+  };
+
+    const handleRestore = async (id) => {
+    if (!window.confirm('Вернуть эту статью из архива? Она станет опубликованной.')) return;
+    try {
+        await postsAPI.restorePost(id);
+        setPosts(posts.filter(post => post.id !== id));
+        alert("Статья успешно возвращена в опубликованные!")
+    } catch (err) {
+        console.error('Error deleting post:', err);
+        const message = err.response?.data?.detail || 'Не удалось вернуть статью';
+        alert(message);
     }
   };
 
@@ -143,25 +166,61 @@ export default function ArchivePosts() {
               </thead>
               <tbody className="divide-y divide-[#e8d8e8]">
                 {posts.map((post) => (
-                  <tr key={post.id} className="hover:bg-[#faf7fa]">
+                 <tr key={post.id} className="hover:bg-[#faf7fa] transition-colors">
+
+                    {/* 1. Колонка: НАЗВАНИЕ */}
                     <td className="px-6 py-4">
-                      <h3 className="font-medium text-[#4a4a4a]">{post.title}</h3>
-                      <div className="flex items-center gap-1 text-xs text-[#9b8b9b] mt-1">
-                        <EyeOff size={12} />
-                        <span>Архив</span>
+                      <div className="flex flex-col">
+                        <h3 className="font-bold text-[#4a4a4a] text-base mb-1">
+                          {post.title || 'Без названия'}
+                        </h3>
+                        <div className="flex items-center gap-2">
+                          <span className="inline-flex items-center gap-1 text-xs text-[#9b8b9b] bg-[#f3e5f5] px-2 py-0.5 rounded-full">
+                            <EyeOff size={10} />
+                            Архив
+                          </span>
+                          {/* Мы убрали вывод (post.status), чтобы не путать пользователя */}
+                        </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-[#6b5e6b]">{formatDate(post.updated_at)}</td>
+
+                    {/* 2. Колонка: ДАТА АРХИВАЦИИ */}
+                    <td className="px-6 py-4 text-sm text-[#6b5e6b]">
+                      {formatDate(post.updated_at)}
+                    </td>
+
+                    {/* 3. Колонка: ДЕЙСТВИЯ (Вернули кнопки!) */}
                     <td className="px-6 py-4">
                       <div className="flex gap-2">
-                        <button onClick={() => handleEdit(post.id)} className="p-2 text-[#42a5f5] hover:bg-[#42a5f5]/10 rounded-lg">
+                        {/* Кнопка Вернуть */}
+                        <button
+                          onClick={() => handleRestore(post.id)}
+                          className="p-2 text-[#6b5e6b] hover:bg-[#e8d8e8] rounded-lg transition-colors"
+                          title="Вернуть из архива"
+                        >
+                          <RotateCcw size={18} />
+                        </button>
+
+                        {/* Кнопка Редактировать */}
+                        <button
+                          onClick={() => handleEdit(post.id)}
+                          className="p-2 text-[#42a5f5] hover:bg-[#42a5f5]/10 rounded-lg transition-colors"
+                          title="Редактировать"
+                        >
                           <Edit2 size={18} />
                         </button>
-                        <button onClick={() => handleDelete(post.id)} className="p-2 text-[#ef5350] hover:bg-[#ef5350]/10 rounded-lg">
+
+                        {/* Кнопка Удалить */}
+                        <button
+                          onClick={() => handleDelete(post.id)}
+                          className="p-2 text-[#ef5350] hover:bg-[#ef5350]/10 rounded-lg transition-colors"
+                          title="Удалить навсегда"
+                        >
                           <Trash2 size={18} />
                         </button>
                       </div>
                     </td>
+
                   </tr>
                 ))}
               </tbody>
@@ -173,12 +232,13 @@ export default function ArchivePosts() {
                   {skip + 1} - {Math.min(skip + limit, total)} из {total}
                 </p>
                 <div className="flex gap-2">
-                  <button onClick={() => setSkip(skip - limit)} disabled={skip === 0} className="p-2 border rounded-lg disabled:opacity-50">
-                    <ChevronLeft size={20} />
-                  </button>
-                  <button onClick={() => setSkip(skip + limit)} disabled={skip + limit >= total} className="p-2 border rounded-lg disabled:opacity-50">
-                    <ChevronRight size={20} />
-                  </button>
+                 <button
+                      onClick={() => setSkip(skip - limit)}
+                      disabled={skip === 0}
+                      className="p-2 border border-[#e8d8e8] rounded-lg disabled:opacity-50 hover:bg-[#f8f0f8] transition-colors"
+                    >
+                      <ChevronLeft size={20} className="text-[#6b5e6b]" />
+                    </button>
                 </div>
               </div>
             )}

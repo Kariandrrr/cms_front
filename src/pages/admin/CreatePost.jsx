@@ -94,13 +94,24 @@ export default function CreatePost() {
             </div>
           )}
 
-          {/* Ошибка */}
           {error && (
-            <div className="mb-6 p-4 bg-[#ffebee] border border-[#ffcdd2] rounded-xl flex items-center gap-3">
-              <AlertCircle className="text-[#d32f2f]" size={20} />
-              <p className="text-[#d32f2f]">{error}</p>
-            </div>
-          )}
+              <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl">
+                <h4 className="font-bold text-red-700 mb-2">Ошибка при создании:</h4>
+                <ul className="text-sm text-red-600 list-disc list-inside">
+                  {Array.isArray(error)
+                    ? error.map((err, idx) => (
+                        <li key={idx}>
+                          {/* Выводим только сообщение об ошибке */}
+                          {err.msg || err.message || JSON.stringify(err)}
+                        </li>
+                      ))
+                    : typeof error === 'object'
+                      ? JSON.stringify(error)
+                      : error
+                  }
+                </ul>
+              </div>
+            )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Заголовок */}
