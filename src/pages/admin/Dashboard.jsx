@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { postsAPI } from "../../api/api_posts";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   LineChart, Line, PieChart, Pie, Legend
@@ -7,7 +8,7 @@ import {
 import {
   Users, FileText, TrendingUp, Calendar, Activity,
   Award, Clock, Sparkles, ArrowUp, ArrowDown, ChevronRight,
-  Edit, Trash2, User, Archive
+  Edit, Trash2, User, Archive, RotateCcw
 } from 'lucide-react';
 import Sidebar from '../../components/admin/Sidebar';
 
@@ -83,8 +84,8 @@ export default function Dashboard() {
   const fetchArticles = async () => {
     try {
       const endpoint = hasRole(['admin'])
-        ? 'http://localhost:8000/articles'
-        : 'http://localhost:8000/articles/my-articles';
+        ? 'http://localhost:8000/posts'
+        : 'http://localhost:8000/posts/my';
 
       const response = await fetch(endpoint, {
         method: 'GET',
@@ -112,7 +113,7 @@ export default function Dashboard() {
   };
 
   const handleEdit = (id) => {
-    window.location.href = `/admin/articles/${id}/edit`;
+    window.location.href = `/admin/posts/${id}/edit`;
   };
 
   const handleDelete = async (id) => {
@@ -131,6 +132,21 @@ export default function Dashboard() {
       }
     }
   };
+
+  const hadnleArchive = async (id) => {
+      if (confirm('Переместить эту статью в архив?')) {
+      try {
+        await postsAPI.archivePost(id);
+        await fetchArticles();
+        await fetchStats();
+        alert('Статья отправлена в архив');
+      } catch (err) {
+        console.error('Error archiving article:', err);
+        const msg = err.response?.data?.detail || 'Ошибка архивации';
+        alert(msg);
+      }
+    }
+  }
 
   // 📊 Данные для графика публикаций по дням из БД
   const postsChartData = stats?.posts_by_day || [
@@ -189,7 +205,7 @@ export default function Dashboard() {
     },
     {
       name: 'В архиве',
-      value: stats?.posts?.achieved_posts || 0,
+      value: stats?.posts?.archived_posts || 0,
       fill: COLORS.text.muted
     },
   ].filter(item => item.value > 0);
@@ -322,22 +338,33 @@ export default function Dashboard() {
               </div>
 
               <div className="col-span-1">
-                <div className="flex gap-1">
-                  <button
-                    onClick={() => handleEdit(article.id)}
-                    className="p-2 rounded-lg border border-[#e8d8e8] hover:border-[#c8a2c8] hover:bg-[#f8f0f8] transition-all group/btn"
-                    title="Редактировать"
-                  >
-                    <Edit className="w-4 h-4 text-[#6b5e6b] group-hover/btn:text-[#c8a2c8]" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(article.id)}
-                    className="p-2 rounded-lg border border-[#e8d8e8] hover:border-[#ef5350] hover:bg-[#ffebee] transition-all group/btn"
-                    title="Удалить"
-                  >
-                    <Trash2 className="w-4 h-4 text-[#6b5e6b] group-hover/btn:text-[#ef5350]" />
-                  </button>
-                </div>
+                    <div className="flex gap-1">
+                      {article.status !== 'archived' && (
+                        <button
+                          onClick={() => hadnleArchive(article.id)}
+                          className="p-2 rounded-lg border border-[#e8d8e8] hover:border-[#9b8b9b] hover:bg-[#f3e5f5] transition-all group/btn"
+                          title="Отправить в архив"
+                        >
+                          <Archive className="w-4 h-4 text-[#6b5e6b] group-hover/btn:text-[#9b8b9b]" />
+                        </button>
+                      )}
+
+                      <button
+                        onClick={() => handleEdit(article.id)}
+                        className="p-2 rounded-lg border border-[#e8d8e8] hover:border-[#c8a2c8] hover:bg-[#f8f0f8] transition-all group/btn"
+                        title="Редактировать"
+                      >
+                        <Edit className="w-4 h-4 text-[#6b5e6b] group-hover/btn:text-[#c8a2c8]" />
+                      </button>
+
+                      <button
+                        onClick={() => handleDelete(article.id)}
+                        className="p-2 rounded-lg border border-[#e8d8e8] hover:border-[#ef5350] hover:bg-[#ffebee] transition-all group/btn"
+                        title="Удалить"
+                      >
+                        <Trash2 className="w-4 h-4 text-[#6b5e6b] group-hover/btn:text-[#ef5350]" />
+                      </button>
+                    </div>
               </div>
             </div>
           ))
@@ -453,7 +480,7 @@ export default function Dashboard() {
       },
       {
         label: 'В архиве',
-        value: stats.posts?.achieved_posts || 0,
+        value: stats.posts?.achived_posts || 0,
         icon: Archive,
         subtitle: 'Архивированные статьи',
         color: 'from-[#9e9e9e] to-[#757575]'
