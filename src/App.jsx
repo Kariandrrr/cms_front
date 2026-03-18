@@ -68,11 +68,11 @@ function App() {
             </ProtectedRoute>
           } />
 
-          {/*<Route path="/admin/archive" element={*/}
-          {/*  <ProtectedRoute roles={['admin', 'editor', 'user']}>*/}
-          {/*    <ArchivePosts />*/}
-          {/*  </ProtectedRoute>*/}
-          {/*} />*/}
+          <Route path="/admin/archive" element={
+            <ProtectedRoute roles={['admin', 'editor', 'user']}>
+              <ArchivePosts />
+            </ProtectedRoute>
+          } />
 
             <Route path="/admin/users" element={
           <ProtectedRoute roles={['admin']}>
